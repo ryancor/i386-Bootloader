@@ -1,4 +1,5 @@
 #include "headers/kernel.h"
+#include "headers/keyboard_map.h"
 
 void delay() {
 	for(unsigned int n = 0; n < 500000000; n++);
@@ -33,6 +34,10 @@ void write_string(const char *string, unsigned int color) {
 void write_newline(void) {
 	unsigned int line_size = BYTES_FOR_EACH_ELEMENT * COLUMNS_IN_LINE;
 	current_loc = current_loc + (line_size - current_loc % (line_size));
+}
+
+void keyboard_handlr_main(void) {
+	return;
 }
 
 void kmain(void) {
