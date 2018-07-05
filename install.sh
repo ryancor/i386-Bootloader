@@ -6,6 +6,12 @@ ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kasm.o x86_kern_src/
 echo "Completed linkage on both files.."
 rm -rf x86_kern_src/*.o
 
+if [ ! -f image/kernel ]; then
+	kstr=$(printf "\n\nkernel image could not be created..")
+	echo "$kstr"
+	exit 1
+fi
+
 echo "..."
 
 dd if=/dev/zero of=kernel.img bs=1024 count=1440
