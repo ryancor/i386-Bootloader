@@ -9,8 +9,36 @@ section .text
 
 
 global start
+global key_handlr
+global read_port
+global write_port
+global load_idt
+
 extern kmain		; kmain is defined in c file
 extern cmain		; cmain is defined in c file
+extern keyboard_handlr_main
+
+read_port:
+	mov   edx, [esp + 4]
+			     ; al is the lower 8 bits of eax
+	in    al, dx         ; dx is the lower 16 bits of edx 
+	ret
+
+write_port:
+	mov   edx, [esp + 4]
+	mov   al, [esp + 4 + 4]
+	out   dx, al
+	ret
+
+load_idt:
+	mov   edx, [esp + 4]
+	lidt  [edx]
+	sti
+	ret
+
+key_handlr:
+	call  keyboard_handlr_main
+	iretd
 
 start:
 	cli		     ; blocks interrupts
@@ -21,7 +49,7 @@ start:
 	mov   edx, 0	     ; new line
 
 	call  cmain
-	cmp   edx, 0	     ; if edx is 0 jmp to exit (loop)
+	cmp   edx, 1	     ; if edx is 0 jmp to exit (loop)
 	je   _exit
 	hlt		     ; halt the CPU
 
