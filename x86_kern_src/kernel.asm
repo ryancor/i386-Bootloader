@@ -16,7 +16,7 @@ global load_idt
 
 extern kmain		; kmain is defined in c file
 extern cmain		; cmain is defined in c file
-extern keyboard_handlr_main
+extern key_handlr_main  ; key_handlr_main is defined in c file
 
 read_port:
 	mov   edx, [esp + 4]
@@ -37,7 +37,7 @@ load_idt:
 	ret
 
 key_handlr:
-	call  keyboard_handlr_main
+	call  key_handlr_main
 	iretd
 
 start:
