@@ -13,6 +13,13 @@ extern void load_idt(unsigned long *idt_ptr);
 // IDT_entry defined in header file
 typedef struct IDT_entry IDT[IDT_SIZE];
 
+void idt_init(void) {
+	return;
+}
+
+void kb_init(void) {
+	return;
+}
 
 void delay() {
 	for(unsigned int n = 0; n < 500000000; n++);
@@ -50,7 +57,28 @@ void write_newline(void) {
 }
 
 void key_handlr_main(void) {
-	return;
+	unsigned char status;
+	char keycode;
+	
+	// write EOI
+	write_port(0x20, 0x20);
+
+	status = read_port(KEYBOARD_STATUS_PORT);
+	// Lowest bit of status will be set if buffer is not empty
+	if(status & 0x1) {
+		keycode = read_port(KEYBOARD_STATUS_PORT);
+		if(keycode < 0) {
+			return;
+		}
+
+		if(keycode == ENTER_KEY_CODE) {
+			write_newline();
+			return;
+		}
+
+		vidptr[current_loc++] = keyboard_map[(unsigned char) keycode];
+		vidptr[current_loc++] = 0x07;
+	}
 }
 
 void kmain(void) {
@@ -88,5 +116,9 @@ void cmain(void) {
 	write_string(str2, 0x06);
 	delay();
 
-	return;
+	// start keyboard
+	idt_init();
+	kb_init();
+
+	while(1);
 }
