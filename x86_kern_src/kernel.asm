@@ -1,67 +1,65 @@
 ;; kernel
 bits 32
 section .text
-	;multiboot spec
-	align 4
-	dd 0x1BADB002	; magic
-	dd 0x00		; flags
-	dd - (0x1BADB002 - 0x00) ; checksum. m+f+c should be zero
-
+        ;multiboot spec
+        align 4
+        dd 0x1BADB002              ; magic
+        dd 0x00                    ; flags
+        dd - (0x1BADB002 + 0x00)   ; checksum. m+f+c should be zero
 
 global start
-global key_handlr
+global keyboard_handler
 global read_port
 global write_port
 global load_idt
 
-extern kmain		; kmain is defined in c file
-extern cmain		; cmain is defined in c file
-extern key_handlr_main  ; key_handlr_main is defined in c file
+extern cmain		; defined in c file
+extern kmain 		; this is defined in the c file
+extern keyboard_handler_main ; defined in the kernel.c
 
 read_port:
 	mov   edx, [esp + 4]
-			     ; al is the lower 8 bits of eax
-	in    al, dx         ; dx is the lower 16 bits of edx 
+			; al is the lower 8 bits of eax
+	in    al, dx	; dx is the lower 16 bits of edx
 	ret
 
 write_port:
-	mov   edx, [esp + 4]
-	mov   al, [esp + 4 + 4]
-	out   dx, al
+	mov   edx, [esp + 4]    
+	mov   al, [esp + 4 + 4]  
+	out   dx, al  
 	ret
 
 load_idt:
 	mov   edx, [esp + 4]
 	lidt  [edx]
-	sti
+	sti 				; turn on interrupts
 	ret
 
-key_handlr:
-	call  key_handlr_main
+keyboard_handler:                 
+	call  keyboard_handler_main
 	iretd
 
 start:
-	cli		     ; blocks interrupts
-	mov   esp, stack_space ; set stack pointer
-	call  kmain
-
-	mov   ecx, nl	     ; new line
-	mov   edx, 0	     ; new line
-
+	cli 				; block interrupts
+	mov   esp, stack_space		; set stack pointer
 	call  cmain
-	cmp   edx, 1	     ; if edx is 0 jmp to exit (loop)
-	je   _exit
-	hlt		     ; halt the CPU
 
-	
+	mov   ecx, nl
+	mov   edx, 0x41
+	cmp   edx, ecx			; compares A to W
+	je    _exit
+
+	call  kmain
+	hlt 				; halt the CPU
+
 _exit:
 	mov   ebx, 0
-	mov   eax, 1	     ; sys_call for exit
+	mov   eax, 1			; sys_call for exit
 	int   0x80
 
 section .bss
-resb 8192		; 8kb for stack
+resb 8192; 8KB for stack
 stack_space:
 
 section .data
-	nl db ' ', 0x0A
+	nl db 'W', 0x0A
