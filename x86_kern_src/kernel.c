@@ -5,7 +5,7 @@
 extern unsigned char keyboard_map[128];
 
 // load defined functions from ASM file
-extern void key_handlr(void);
+extern void keyboard_handler(void);
 extern char read_port(unsigned short port);
 extern void write_port(unsigned short port, unsigned char data);
 extern void load_idt(unsigned long *idt_ptr);
@@ -18,50 +18,53 @@ void idt_init(void) {
 	unsigned long idt_address;
 	unsigned long idt_ptr[2];
 
-	// populate idt entry for keyboard interrupt
-	keyboard_address = (unsigned long)key_handlr;
+	// populate IDT entry of keyboard's interrupt
+	keyboard_address = (unsigned long)keyboard_handler;
 	IDT[0x21].offset_lowerbits = keyboard_address & 0xffff;
-	IDT[0x21].selector = KERNEL_CODE_SEG_OFFSET;
+	IDT[0x21].selector = KERNEL_CODE_SEGMENT_OFFSET;
 	IDT[0x21].zero = 0;
 	IDT[0x21].type_attr = INTERRUPT_GATE;
 	IDT[0x21].offset_higherbits = (keyboard_address & 0xffff0000) >> 16;
 
 
-	/* Ports
-		     PIC1    PIC2
-	   Command   0x20    0xA0
-	   Data      0x21    0xA1	
+	/*     Ports
+	*	 PIC1	PIC2
+	*Command 0x20	0xA0
+	*Data	 0x21	0xA1
 	*/
-	// ICW1 - begin init
+
+	// ICW1 - begin initialization
 	write_port(0x20, 0x11);
 	write_port(0xA0, 0x11);
 
-	// ICW2 - remap offset addr for idt
+	// ICW2 - remap offset address of IDT
 	write_port(0x21, 0x20);
 	write_port(0xA1, 0x28);
 
 	// ICW3 - setup cascading
 	write_port(0x21, 0x00);
 	write_port(0xA1, 0x00);
-	
-	// ICW4 - environment info
+
+	// ICW4 - environment info 
 	write_port(0x21, 0x01);
 	write_port(0xA1, 0x01);
+
+	// Initialization finished
 
 	// mask interrupts
 	write_port(0x21, 0xff);
 	write_port(0xA1, 0xff);
 
-	// fill idt descriptor
+	// fill the IDT descriptor
 	idt_address = (unsigned long)IDT;
-	idt_ptr[0] = (sizeof(struct IDT_entry) * IDT_SIZE) + ((idt_address & 0xffff) << 16);
+	idt_ptr[0] = (sizeof (struct IDT_entry) * IDT_SIZE) + ((idt_address & 0xffff) << 16);
 	idt_ptr[1] = idt_address >> 16;
 
 	load_idt(idt_ptr);
 }
 
 void kb_init(void) {
-	// 0xFD enables only IRQ1 (keyboard)
+	/* 0xFD is 11111101 - enables only IRQ1 (keyboard)*/
 	write_port(0x21, 0xFD);
 }
 
@@ -69,54 +72,52 @@ void delay() {
 	for(unsigned int n = 0; n < 500000000; n++);
 }
 
-void clear_screen() {
-	unsigned int j = 0;
-
-	// this loop clears the screen
-	// each line takes 2 bytes
-	while(j < 80 * 25 * 2) {
-		// blank character
-		vidptr[j] = ' ';
-		// attribute byte
-		vidptr[j+1] = 0x07;
-		j = j + 2;
-	}
-}
-
-void write_string(const char *string, unsigned int color) {
+void kprint(const char *string, unsigned int color) {
 	unsigned int i = 0;
 
 	// writes string to video memory
 	while(string[i] != '\0') {
 		// the characters ascii
 		vidptr[current_loc++] = string[i++];
-		// attribute byte - give character black bg
+		// attribute byte - give character color
 		vidptr[current_loc++] = color;
 	}
 }
 
-void write_newline(void) {
+void kprint_newline(void) {
 	unsigned int line_size = BYTES_FOR_EACH_ELEMENT * COLUMNS_IN_LINE;
 	current_loc = current_loc + (line_size - current_loc % (line_size));
 }
 
-void key_handlr_main(void) {
+void clear_screen(void) {
+	unsigned int i = 0;
+
+	// this loop clears the screen
+	// each line takes 2 bytes
+	while (i < SCREENSIZE) {
+		// blank character
+		vidptr[i++] = ' ';
+		// attribute byte
+		vidptr[i++] = 0x07;
+	}
+}
+
+void keyboard_handler_main(void) {
 	unsigned char status;
 	char keycode;
-	
-	// write EOI
+
+	/* write EOI */
 	write_port(0x20, 0x20);
 
 	status = read_port(KEYBOARD_STATUS_PORT);
-	// Lowest bit of status will be set if buffer is not empty
-	if(status & 0x1) {
-		keycode = read_port(KEYBOARD_STATUS_PORT);
-		if(keycode < 0) {
+	/* Lowest bit of status will be set if buffer is not empty */
+	if (status & 0x01) {
+		keycode = read_port(KEYBOARD_DATA_PORT);
+		if(keycode < 0)
 			return;
-		}
 
 		if(keycode == ENTER_KEY_CODE) {
-			write_newline();
+			kprint_newline();
 			return;
 		}
 
@@ -125,42 +126,43 @@ void key_handlr_main(void) {
 	}
 }
 
-void kmain(void) {
+void cmain(void) {
 	const char *str = "[1.11] My Grubby Kernel";
 	const char *str2 = "[2.22]  What to do next? :)";
 
 	clear_screen();
 
 	// write first string
-	write_string(str, 0x07);
-	write_newline();
+	kprint(str, 0x07);
+	kprint_newline();
 
 	// delay and break new line
 	delay();
 
 	// write second string
-	write_string(str2, 0x03);
-	write_string("!~", 0x12);
+	kprint(str2, 0x03);
+	kprint("!~", 0x12);
 
 	delay();
 
 	return;
 }
 
-void cmain(void) {
+void kmain(void) {
 	const char *str = "[+] loading kernel scripts";
 	const char *str2 = "[3.33] ... Finished Booting ...";
 	
 	clear_screen();
 
-	write_string(str, 0x05);
+	kprint(str, 0x05);
 	delay();
 	
-	write_newline();
-	write_string(str2, 0x06);
+	kprint_newline();
+	kprint(str2, 0x06);
 
-	write_newline();
-	write_newline();
+	kprint_newline();
+	kprint_newline();
+	kprint_newline();
 
 	// start keyboard
 	idt_init();
@@ -168,4 +170,3 @@ void cmain(void) {
 
 	while(1);
 }
-
