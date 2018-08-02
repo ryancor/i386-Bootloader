@@ -11,14 +11,58 @@ extern void write_port(unsigned short port, unsigned char data);
 extern void load_idt(unsigned long *idt_ptr);
 
 // IDT_entry defined in header file
-typedef struct IDT_entry IDT[IDT_SIZE];
+struct IDT_entry IDT[IDT_SIZE];
 
 void idt_init(void) {
-	return;
+	unsigned long keyboard_address;
+	unsigned long idt_address;
+	unsigned long idt_ptr[2];
+
+	// populate idt entry for keyboard interrupt
+	keyboard_address = (unsigned long)key_handlr;
+	IDT[0x21].offset_lowerbits = keyboard_address & 0xffff;
+	IDT[0x21].selector = KERNEL_CODE_SEG_OFFSET;
+	IDT[0x21].zero = 0;
+	IDT[0x21].type_attr = INTERRUPT_GATE;
+	IDT[0x21].offset_higherbits = (keyboard_address & 0xffff0000) >> 16;
+
+
+	/* Ports
+		     PIC1    PIC2
+	   Command   0x20    0xA0
+	   Data      0x21    0xA1	
+	*/
+	// ICW1 - begin init
+	write_port(0x20, 0x11);
+	write_port(0xA0, 0x11);
+
+	// ICW2 - remap offset addr for idt
+	write_port(0x21, 0x20);
+	write_port(0xA1, 0x28);
+
+	// ICW3 - setup cascading
+	write_port(0x21, 0x00);
+	write_port(0xA1, 0x00);
+	
+	// ICW4 - environment info
+	write_port(0x21, 0x01);
+	write_port(0xA1, 0x01);
+
+	// mask interrupts
+	write_port(0x21, 0xff);
+	write_port(0xA1, 0xff);
+
+	// fill idt descriptor
+	idt_address = (unsigned long)IDT;
+	idt_ptr[0] = (sizeof(struct IDT_entry) * IDT_SIZE) + ((idt_address & 0xffff) << 16);
+	idt_ptr[1] = idt_address >> 16;
+
+	load_idt(idt_ptr);
 }
 
 void kb_init(void) {
-	return;
+	// 0xFD enables only IRQ1 (keyboard)
+	write_port(0x21, 0xFD);
 }
 
 void delay() {
@@ -114,7 +158,9 @@ void cmain(void) {
 	
 	write_newline();
 	write_string(str2, 0x06);
-	delay();
+
+	write_newline();
+	write_newline();
 
 	// start keyboard
 	idt_init();
@@ -122,3 +168,4 @@ void cmain(void) {
 
 	while(1);
 }
+
