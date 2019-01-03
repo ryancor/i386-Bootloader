@@ -12,14 +12,19 @@
 #define ENTER_KEY_CODE 			0x1C
 
 
-unsigned int current_loc = 0; // current cursor location
-char *vidptr = (char*)0xb8000; // video memory begin
+static unsigned int current_loc = 0; // current cursor location
+static char *vidptr = (char*)0xb8000; // video memory begin
 
 
-struct IDT_entry {
+struct IDT_entry 
+{
 	unsigned short int offset_lowerbits;
 	unsigned short int selector;
 	unsigned char zero;
 	unsigned char type_attr;
 	unsigned short int offset_higherbits;
 };
+
+// API for print to screen
+void kprint(const char *string, unsigned int color);
+void kprint_newline(void);
