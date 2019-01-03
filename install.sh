@@ -1,10 +1,13 @@
 nasm -f elf32 x86_kern_src/kernel.asm -o x86_kern_src/kasm.o
 echo "Finished compiling asm file"
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel.c -o x86_kern_src/kc.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/user-mode.c -o x86_kern_src/uc.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/grub_framework/s_string.c -o x86_kern_src/grub_framework/s_string.o
 echo "Finished compiling object files"
-ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kasm.o x86_kern_src/kc.o
+ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kasm.o x86_kern_src/kc.o x86_kern_src/uc.o x86_kern_src/grub_framework/s_string.o
 echo "Completed linkage on both files.."
 rm -rf x86_kern_src/*.o
+rm -rf x86_kern_src/grub_framework/*.o
 
 if [ ! -f image/kernel ]; then
 	kstr=$(printf "\n\nkernel image could not be created..")
