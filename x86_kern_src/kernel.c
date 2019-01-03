@@ -1,5 +1,7 @@
 #include "headers/kernel.h"
+#include "headers/user-mode.h"
 #include "headers/keyboard_map.h"
+#include "grub_framework/headers/s_string.h"
 
 // key map from header file
 extern unsigned char keyboard_map[128];
@@ -13,7 +15,8 @@ extern void load_idt(unsigned long *idt_ptr);
 // IDT_entry defined in header file
 struct IDT_entry IDT[IDT_SIZE];
 
-void idt_init(void) {
+void idt_init(void) 
+{
 	unsigned long keyboard_address;
 	unsigned long idt_address;
 	unsigned long idt_ptr[2];
@@ -63,20 +66,24 @@ void idt_init(void) {
 	load_idt(idt_ptr);
 }
 
-void kb_init(void) {
+void kb_init(void) 
+{
 	// 0xFD is 11111101 - enables only IRQ1 (keyboard)
 	write_port(0x21, 0xFD);
 }
 
-void delay() {
+void delay() 
+{
 	for(unsigned int n = 0; n < 500000000; n++);
 }
 
-void kprint(const char *string, unsigned int color) {
+void kprint(const char *string, unsigned int color) 
+{
 	unsigned int i = 0;
 
 	// writes string to video memory
-	while(string[i] != '\0') {
+	while(string[i] != '\0') 
+	{
 		// the characters ascii
 		vidptr[current_loc++] = string[i++];
 		// attribute byte - give character color
@@ -84,17 +91,20 @@ void kprint(const char *string, unsigned int color) {
 	}
 }
 
-void kprint_newline(void) {
+void kprint_newline(void) 
+{
 	unsigned int line_size = BYTES_FOR_EACH_ELEMENT * COLUMNS_IN_LINE;
 	current_loc = current_loc + (line_size - current_loc % (line_size));
 }
 
-void clear_screen(void) {
+void clear_screen(void) 
+{
 	unsigned int i = 0;
 
 	// this loop clears the screen
 	// each line takes 2 bytes
-	while (i < SCREENSIZE) {
+	while (i < SCREENSIZE) 
+	{
 		// blank character
 		vidptr[i++] = ' ';
 		// attribute byte
@@ -102,31 +112,51 @@ void clear_screen(void) {
 	}
 }
 
-void keyboard_handler_main(void) {
+void keyboard_handler_main(void) 
+{
 	unsigned char status;
+	char key[2];
 	char keycode;
+	char temp_key_string_holder[1024];
+	const char *temp_keycode;
 
 	/* write EOI */
 	write_port(0x20, 0x20);
 
 	status = read_port(KEYBOARD_STATUS_PORT);
 	/* Lowest bit of status will be set if buffer is not empty */
-	if (status & 0x01) {
+	if (status & 0x01) 
+	{
 		keycode = read_port(KEYBOARD_DATA_PORT);
 		if(keycode < 0)
-			return;
-
-		if(keycode == ENTER_KEY_CODE) {
-			kprint_newline();
+		{
 			return;
 		}
 
+		if(keycode == ENTER_KEY_CODE) 
+		{
+			kprint_newline();
+			terminal_commands(temp_key_string_holder);
+			flush(temp_key_string_holder);		
+
+			kprint_newline();
+			kprint("> ", 0x09); // terminal cursor
+			return;
+		}
+
+		temp_keycode = &keyboard_map[(unsigned char) keycode];
+		s_strncpy(key, &temp_keycode[0], 1);
+		strcat(temp_key_string_holder, key);
+
+		// keycode will return a integer that needs to be converted to position
+		// for keyboard map
 		vidptr[current_loc++] = keyboard_map[(unsigned char) keycode];
 		vidptr[current_loc++] = 0x07;
 	}
 }
 
-void cmain(void) {
+void cmain(void) 
+{
 	const char *str = "[1.11] My Grubby Kernel";
 	const char *str2 = "[2.22]  What to do next? :)";
 
@@ -148,7 +178,8 @@ void cmain(void) {
 	return;
 }
 
-void kmain(void) {
+void kmain(void) 
+{
 	const char *str = "[+] loading kernel scripts";
 	const char *str2 = "[3.33] ... Finished Booting ...";
 	
