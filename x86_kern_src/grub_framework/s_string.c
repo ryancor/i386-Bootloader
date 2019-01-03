@@ -3,7 +3,8 @@
 void flush(char *var) 
 {
 	int i = 0;
-	while(var[i] != '\0') {
+	while(var[i] != '\0') 
+	{
 		var[i] = '\0';
 		i++;
 	}
