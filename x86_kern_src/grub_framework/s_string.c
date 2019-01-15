@@ -1,5 +1,11 @@
 #include "headers/s_string.h"
 
+void backspace(char s[])
+{
+	int len = strlen(s);
+	s[len-1] = '\0';
+}
+
 void flush(char *var) 
 {
 	int i = 0;
@@ -32,6 +38,15 @@ void *memset(void *str, int c, size_t n)
 	}
 
 	return str;
+}
+
+void memory_copy(unsigned char *source, unsigned char *dest, int nbytes) 
+{
+	int i;
+	for (i = 0; i < nbytes; i++) 
+	{
+		*(dest + i) = *(source + i);
+	}
 }
 
 int strcmp(const char *stra, const char *strb)

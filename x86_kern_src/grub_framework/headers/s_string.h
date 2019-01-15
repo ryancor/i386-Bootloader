@@ -1,10 +1,14 @@
 #define size_t		unsigned long int
 
+void backspace(char s[]);
+
 void flush(char *var);
 
 void *memcpy(void *dest, const void *src, size_t n);
 
 void *memset(void *str, int c, size_t n);
+
+void memory_copy(unsigned char *source, unsigned char *dest, int nbytes);
 
 int strcmp(const char *stra, const char *strb);
 
