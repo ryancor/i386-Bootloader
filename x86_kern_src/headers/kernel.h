@@ -10,7 +10,11 @@
 #define KERNEL_CODE_SEGMENT_OFFSET 	0x08
 
 #define ENTER_KEY_CODE 			0x1C
+#define ENTER_BACKSPACE_CODE		0x0E
 
+// Screen I/O ports
+#define REG_SCREEN_CTRL			0x3d4
+#define REG_SCREEN_DATA			0x3d5
 
 static unsigned int current_loc = 0; // current cursor location
 static char *vidptr = (char*)0xb8000; // video memory begin
