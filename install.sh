@@ -1,13 +1,19 @@
-nasm -f elf32 x86_kern_src/kernel.asm -o x86_kern_src/kasm.o
+nasm -f elf32 x86_kern_src/kernel/kernel.asm -o x86_kern_src/kernel/kasm.o
 echo "Finished compiling asm file"
-gcc -fno-stack-protector -m32 -c x86_kern_src/kernel.c -o x86_kern_src/kc.o
-gcc -fno-stack-protector -m32 -c x86_kern_src/user-mode.c -o x86_kern_src/uc.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/kernel.c -o x86_kern_src/kernel/kc.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/userspace/shell.c -o x86_kern_src/userspace/shell.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/grub_framework/s_string.c -o x86_kern_src/grub_framework/s_string.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/ports/ports.c -o x86_kern_src/kernel/ports/ports.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/drivers/screen.c -o x86_kern_src/drivers/screen.o
 echo "Finished compiling object files"
-ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kasm.o x86_kern_src/kc.o x86_kern_src/uc.o x86_kern_src/grub_framework/s_string.o
+ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kernel/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/drivers/screen.o
 echo "Completed linkage on both files.."
 rm -rf x86_kern_src/*.o
+rm -rf x86_kern_src/kernel/*.o
+rm -rf x86_kern_src/userspace/*.o
 rm -rf x86_kern_src/grub_framework/*.o
+rm -rf x86_kern_src/kernel/ports/*.o
+rm -rf x86_kern_src/drivers/*.o
 
 if [ ! -f image/kernel ]; then
 	kstr=$(printf "\n\nkernel image could not be created..")
