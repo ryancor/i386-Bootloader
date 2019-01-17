@@ -2,6 +2,7 @@
 #include "../headers/kernel.h"
 #include "../headers/screen.h"
 #include "../headers/shell.h"
+#include "../kernel/interrupts/headers/int.h"
 #include "../grub_framework/headers/s_string.h"
 
 void terminal_commands(char *keycode_string)
@@ -25,9 +26,12 @@ void terminal_commands(char *keycode_string)
 	}
 	else if(strcmp(keycode_string, "shutdown") == 0) {
 		kprint("Goodbye!", 0x07);
-		// disable interrupts, then halt the CPU
-		__asm__("cli; \
-			hlt");
+		// disable interrupts (if enabled), then halt the CPU
+		if(are_interrupts_enabled())
+		{
+			__asm__("cli");
+		}
+		__asm__("hlt");
 	}
 	else if(strcmp(keycode_string, "whoami") == 0) {
 		kprint("Ringo, but lets call you root ;)", 0x07);
