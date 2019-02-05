@@ -1,3 +1,5 @@
+#include "../cpu/isr.h"
+#include "../cpu/idt.h"
 #include "../headers/ports.h"
 #include "../headers/screen.h"
 #include "../headers/kernel.h"
@@ -144,6 +146,15 @@ void cmain(void)
 	// write second string
 	kprint(str2, 0x03);
 	kprint("!~", 0x12);
+
+	delay();
+
+	// test the interrupts
+	isr_install();
+
+	__asm__ __volatile__("int $2");
+	__asm__ __volatile__("int $3");
+	// end of test
 
 	delay();
 
