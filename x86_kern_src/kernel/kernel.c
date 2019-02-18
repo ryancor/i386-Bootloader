@@ -171,6 +171,9 @@ void kmain(void)
 	kprint(str, 0x05);
 	delay();
 
+	__asm__ __volatile__("int $4");
+	delay();
+
 	kprint_newline();
 	kprint(str2, 0x06);
 
