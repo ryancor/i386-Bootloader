@@ -1,9 +1,10 @@
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 #include "../headers/ports.h"
+#include "../headers/mouse.h"
+#include "../headers/shell.h"
 #include "../headers/screen.h"
 #include "../headers/kernel.h"
-#include "../headers/shell.h"
 #include "../headers/keyboard_map.h"
 #include "../grub_framework/headers/s_string.h"
 
@@ -163,13 +164,15 @@ void cmain(void)
 
 void kmain(void)
 {
-	const char *str = "[+] loading kernel scripts";
+	const char *str = "[+] loading kernel drivers";
 	const char *str2 = "[3.33] ... Finished Booting ...";
 
 	clear_screen();
 
 	kprint(str, 0x05);
 	delay();
+
+	mouse_install();
 
 	__asm__ __volatile__("int $4");
 	delay();
