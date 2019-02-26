@@ -7,10 +7,11 @@ gcc -fno-stack-protector -m32 -c x86_kern_src/cpu/isr.c -o x86_kern_src/cpu/isr.
 gcc -fno-stack-protector -m32 -c x86_kern_src/userspace/shell.c -o x86_kern_src/userspace/shell.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/grub_framework/s_string.c -o x86_kern_src/grub_framework/s_string.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/ports/ports.c -o x86_kern_src/kernel/ports/ports.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/drivers/mouse.c -o x86_kern_src/drivers/mouse.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/drivers/screen.c -o x86_kern_src/drivers/screen.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/interrupts/int.c -o x86_kern_src/kernel/interrupts/int.o
 echo "Finished compiling object files"
-ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kernel/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/cpu/interrupt.o x86_kern_src/cpu/idt.o x86_kern_src/cpu/isr.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/drivers/screen.o x86_kern_src/kernel/interrupts/int.o
+ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/kernel/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/cpu/interrupt.o x86_kern_src/cpu/idt.o x86_kern_src/cpu/isr.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/drivers/screen.o x86_kern_src/drivers/mouse.o x86_kern_src/kernel/interrupts/int.o
 echo "Completed linkage on both files.."
 rm -rf x86_kern_src/*.o
 rm -rf x86_kern_src/cpu/*.o
