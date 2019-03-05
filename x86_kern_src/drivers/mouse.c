@@ -1,4 +1,6 @@
 #include "../cpu/isr.h"
+#include "../kernel/fs/fs.h"
+#include "../kernel/fs/pipe.h"
 #include "../headers/ports.h"
 #include "../headers/mouse.h"
 #include "../headers/screen.h"
@@ -21,7 +23,7 @@ signed char mouse_byte[3];
 signed char mouse_x = 0;
 signed char mouse_y = 0;
 
-//fs_node_t *mouse_pipe;
+fs_node_t *mouse_pipe;
 
 void mouse_handler(isr_t *a_r)
 {
@@ -66,11 +68,11 @@ void mouse_handler(isr_t *a_r)
 
 			mouse_device_packet_t bitbucket;
 			// have to write these functions			
-			//while(pipe_size(mouse_pipe) > (DISCARD_POINT * sizeof(packet)))
-			//{
-			//	read_fs(mouse_pipe, 0, sizeof(packet), (uint8_t *)&packet);
-			//}
-			//write_fs(mouse_pipe, 0, sizeof(packet), (uint8_t *)&packet);
+			while(pipe_size(mouse_pipe) > (DISCARD_POINT * sizeof(packet)))
+			{
+				read_fs(mouse_pipe, 0, sizeof(packet), (uint8_t *)&packet);
+			}
+			write_fs(mouse_pipe, 0, sizeof(packet), (uint8_t *)&packet);
 			break;
 	}
 }
@@ -124,7 +126,7 @@ void mouse_install()
 {
 	unsigned char _status;
 
-	//mouse_pipe = make_pipe(sizeof(mouse_device_packet_t) * PACKETS_IN_PIPE);
+	mouse_pipe = make_pipe(sizeof(mouse_device_packet_t) * PACKETS_IN_PIPE);
 
 	// Enable the aux mouse device
 	mouse_wait(1);
