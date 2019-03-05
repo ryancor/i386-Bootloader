@@ -25,3 +25,7 @@ char *strcat(char *dest, const char *src);
 char *s_strncpy(char *s1, const char *s2, size_t n);
 
 void int_to_ascii(int n, char str[]);
+
+int s_sprintf(char *buf, const char *fmt);
+
+void *s_malloc(unsigned int size);

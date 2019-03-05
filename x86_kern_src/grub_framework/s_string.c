@@ -144,3 +144,25 @@ void int_to_ascii(int n, char str[])
 	}
 	str[i] = '\0';
 }
+
+
+// These functions need to be built out
+size_t s_vasprintf(char *buf, const char *fmt)//, va_list args)
+{
+	return 1;
+}
+
+int s_sprintf(char *buf, const char *fmt)
+{
+	//va_list args;
+	//va_start(args, fmt);
+	int out = s_vasprintf(buf, fmt);//, args);
+	//va_end(args);
+	return out;
+}
+
+void *s_malloc(unsigned int size)
+{
+	void *ret = (void*)size;
+	return ret;
+}
