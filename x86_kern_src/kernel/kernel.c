@@ -132,8 +132,8 @@ void keyboard_handler_main(void)
 
 void cmain(void)
 {
-	const char *str = "[1.11] My Grubby Kernel";
-	const char *str2 = "[2.22]  What to do next? :)";
+	const char *str = "[1.11] Ringo OS";
+	const char *str2 = "[2.22]  Loading interface scripts";
 
 	clear_screen();
 
