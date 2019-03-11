@@ -1,3 +1,4 @@
+#include "../headers/time.h"
 #include "../headers/ports.h"
 #include "../headers/kernel.h"
 #include "../headers/screen.h"
@@ -35,6 +36,14 @@ void terminal_commands(char *keycode_string)
 	}
 	else if(strcmp(keycode_string, "whoami") == 0) {
 		kprint("Ringo, but lets call you root ;)", 0x07);
+		kprint_newline();
+	}
+	else if(strcmp(keycode_string, "time") == 0) {
+		char time_ascii[256];
+		int_to_ascii(epoch_now(), time_ascii);
+
+		kprint("Current time: ", 0x07);
+		kprint(time_ascii, 0x07);
 		kprint_newline();
 	}
 	else {
