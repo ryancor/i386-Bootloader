@@ -1,5 +1,6 @@
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
+#include "../cpu/timer.h"
 #include "../headers/ports.h"
 #include "../headers/mouse.h"
 #include "../headers/shell.h"
@@ -174,7 +175,8 @@ void kmain(void)
 
 	mouse_install();
 
-	__asm__ __volatile__("int $4");
+	__asm__ __volatile__("sti");
+	init_timer(50);
 	delay();
 
 	kprint_newline();
