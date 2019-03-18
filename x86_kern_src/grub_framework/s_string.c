@@ -1,5 +1,12 @@
 #include "headers/s_string.h"
 
+void append(char s[], char n)
+{
+	int len = strlen(s);
+	s[len] = n;
+	s[len+1] = '\0';
+}
+
 void backspace(char s[])
 {
 	int len = strlen(s);
@@ -145,6 +152,40 @@ void int_to_ascii(int n, char str[])
 	str[i] = '\0';
 }
 
+void hex_to_ascii(int n, char str[])
+{
+	append(str, '0');
+	append(str, 'x');
+	char zeros = 0;
+
+	int32_t tmp;
+	int i;
+	for(i = 28; i > 0; i -= 4)
+	{
+		tmp = (n >> i) & 0xF;
+		if(tmp == 0 && zeros == 0)
+		{
+			continue;
+		}
+		zeros = 1;
+		if(tmp > 0xA) 
+		{
+			append(str, tmp - 0xA + 'a');
+		}
+		else {
+			append(str, tmp + '0');
+		}
+	}
+
+	tmp = n & 0xF;
+	if(tmp >= 0xA)
+	{
+		append(str, tmp - 0xA + 'a');
+	}
+	else {
+		append(str, tmp + '0');
+	}
+}
 
 // These functions need to be built out
 size_t s_vasprintf(char *buf, const char *fmt)//, va_list args)
@@ -166,3 +207,25 @@ void *s_malloc(unsigned int size)
 	void *ret = (void*)size;
 	return ret;
 }
+
+uint32_t free_mem_addr = 0x10000;
+
+uint32_t kmalloc(size_t size, int align, uint32_t *phys_addr)
+{
+	// Pages are aligned to 4K, or 0x1000
+	if(align == 1 && (free_mem_addr & 0xFFFFF000))
+	{
+		free_mem_addr &= 0xFFFFF000;
+		free_mem_addr += 0x1000;
+	}
+	// Save the physical address
+	if(phys_addr)
+	{
+		*phys_addr = free_mem_addr;
+	}
+
+	uint32_t ret = free_mem_addr;
+	free_mem_addr += size; 
+	return ret;
+}
+

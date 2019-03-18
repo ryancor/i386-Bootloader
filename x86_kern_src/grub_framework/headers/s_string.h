@@ -26,6 +26,10 @@ char *s_strncpy(char *s1, const char *s2, size_t n);
 
 void int_to_ascii(int n, char str[]);
 
+void hex_to_ascii(int n, char str[]);
+
 int s_sprintf(char *buf, const char *fmt);
 
 void *s_malloc(unsigned int size);
+
+uint32_t kmalloc(size_t size, int align, uint32_t *phys_addr);
