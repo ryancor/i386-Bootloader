@@ -46,6 +46,19 @@ void terminal_commands(char *keycode_string)
 		kprint(time_ascii, 0x07);
 		kprint_newline();
 	}
+	else if(strcmp(keycode_string, "page") == 0) {
+		uint32_t phys_addr;
+		uint32_t page = kmalloc(1000, 1, &phys_addr);
+		char page_str[16] = "";
+		hex_to_ascii(page, page_str);
+		char phys_str[16] = "";
+		hex_to_ascii(phys_addr, phys_str);
+		kprint("Page: ", 0x07);
+		kprint(page_str, 0x07);
+		kprint(", physical address: ", 0x07);
+		kprint(phys_str, 0x07);
+		kprint("\n", 0x07);		
+	}
 	else {
 		kprint("Command ", 0x07);
 		kprint(keycode_string, 0x08);
