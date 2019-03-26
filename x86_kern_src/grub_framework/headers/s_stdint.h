@@ -1,3 +1,4 @@
+#define NULL				((void*)0)
 #ifndef __int8_t_defined
 #define __int8_t_defined
 typedef signed char                	int8_t;
@@ -19,3 +20,4 @@ typedef unsigned long int        	uint64_t;
 #else
 typedef unsigned long long int        	uint64_t;
 #endif
+typedef unsigned long                   uintptr_t;
