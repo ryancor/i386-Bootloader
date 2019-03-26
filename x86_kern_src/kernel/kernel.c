@@ -1,11 +1,13 @@
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 #include "../cpu/timer.h"
+#include "../boot/multiboot.h"
 #include "../headers/ports.h"
 #include "../headers/mouse.h"
 #include "../headers/shell.h"
 #include "../headers/screen.h"
 #include "../headers/kernel.h"
+#include "../headers/system.h"
 #include "../headers/keyboard_map.h"
 #include "../grub_framework/headers/s_string.h"
 
@@ -20,6 +22,7 @@ extern void load_idt(unsigned long *idt_ptr);
 
 // IDT_entry defined in header file
 struct IDT_entry IDT[IDT_SIZE];
+struct multiboot *mboot = NULL;
 
 void idt_init(void)
 {
@@ -178,6 +181,11 @@ void kmain(void)
 	__asm__ __volatile__("sti");
 	init_timer(50);
 	delay();
+
+	// Memory Management
+	mboot_ptr = mboot;
+	paging_install(mboot_ptr->mem_upper + mboot_ptr->mem_lower);
+	heap_install();	
 
 	kprint_newline();
 	kprint(str2, 0x06);
