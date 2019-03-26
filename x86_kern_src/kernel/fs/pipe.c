@@ -1,7 +1,5 @@
 #include "pipe.h"
 
-#define NULL	((void*)0)
-
 static inline size_t pipe_unread(pipe_device_t *pipe)
 {
 	if(pipe->read_ptr == pipe->write_ptr)
