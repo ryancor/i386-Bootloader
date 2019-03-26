@@ -7,16 +7,17 @@ gcc -fno-stack-protector -m32 -c x86_kern_src/cpu/isr.c -o x86_kern_src/cpu/isr.
 gcc -fno-stack-protector -m32 -c x86_kern_src/cpu/timer.c -o x86_kern_src/cpu/timer.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/userspace/shell.c -o x86_kern_src/userspace/shell.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/grub_framework/s_string.c -o x86_kern_src/grub_framework/s_string.o
-gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/ports/ports.c -o x86_kern_src/kernel/ports/ports.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/drivers/mouse.c -o x86_kern_src/drivers/mouse.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/drivers/screen.c -o x86_kern_src/drivers/screen.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/drivers/cmos.c -o x86_kern_src/drivers/cmos.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/ports/ports.c -o x86_kern_src/kernel/ports/ports.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/interrupts/int.c -o x86_kern_src/kernel/interrupts/int.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/fs/fs.c -o x86_kern_src/kernel/fs/fs.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/fs/list.c -o x86_kern_src/kernel/fs/list.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/fs/pipe.c -o x86_kern_src/kernel/fs/pipe.o
+gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/mem/mem.c -o x86_kern_src/kernel/mem/mem.o
 echo "Finished compiling object files"
-ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/boot/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/cpu/interrupt.o x86_kern_src/cpu/idt.o x86_kern_src/cpu/isr.o x86_kern_src/cpu/timer.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/kernel/fs/fs.o x86_kern_src/kernel/fs/pipe.o x86_kern_src/kernel/fs/list.o x86_kern_src/drivers/screen.o x86_kern_src/drivers/mouse.o x86_kern_src/drivers/cmos.o x86_kern_src/kernel/interrupts/int.o
+ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/boot/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/cpu/interrupt.o x86_kern_src/cpu/idt.o x86_kern_src/cpu/isr.o x86_kern_src/cpu/timer.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/kernel/fs/fs.o x86_kern_src/kernel/fs/pipe.o x86_kern_src/kernel/fs/list.o x86_kern_src/kernel/mem/mem.o x86_kern_src/drivers/screen.o x86_kern_src/drivers/mouse.o x86_kern_src/drivers/cmos.o x86_kern_src/kernel/interrupts/int.o
 echo "Completed linkage on both files.."
 rm -rf x86_kern_src/*.o
 rm -rf x86_kern_src/cpu/*.o
@@ -26,6 +27,7 @@ rm -rf x86_kern_src/userspace/*.o
 rm -rf x86_kern_src/grub_framework/*.o
 rm -rf x86_kern_src/kernel/ports/*.o
 rm -rf x86_kern_src/kernel/fs/*.o
+rm -rf x86_kern_src/kernel/mem/*.o
 rm -rf x86_kern_src/drivers/*.o
 rm -rf x86_kern_src/kernel/interrupts/*.o
 
