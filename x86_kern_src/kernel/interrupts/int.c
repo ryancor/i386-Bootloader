@@ -17,7 +17,7 @@ static inline unsigned long save_irqdisable(void)
 	asm volatile("pushf\n\tcli\n\tpop %0" : "=r"(flags) : : "memory");
 }
 
-static inline void irqrestore(unsigned long flags)
+void irqrestore(unsigned long flags)
 {
 	asm("push %0\n\tpopf" : : "rm"(flags) : "memory","cc");
 }
