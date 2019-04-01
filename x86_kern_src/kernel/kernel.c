@@ -137,7 +137,7 @@ void keyboard_handler_main(void)
 void cmain(void)
 {
 	const char *str = "[1.11] Ringo OS";
-	const char *str2 = "[2.22]  Loading interface scripts";
+	const char *str2 = "[2.22]  Loading hardware drivers";
 
 	clear_screen();
 
@@ -161,6 +161,14 @@ void cmain(void)
 	__asm__ __volatile__("int $3");
 	// end of test
 
+	// Memory Management
+        mboot_ptr = mboot;
+        paging_install(mboot_ptr->mem_upper + mboot_ptr->mem_lower);
+        heap_install(); 
+
+        // Hardware drivers
+        tasking_install();
+
 	delay();
 
 	return;
@@ -181,11 +189,6 @@ void kmain(void)
 	__asm__ __volatile__("sti");
 	init_timer(50);
 	delay();
-
-	// Memory Management
-	mboot_ptr = mboot;
-	paging_install(mboot_ptr->mem_upper + mboot_ptr->mem_lower);
-	heap_install();	
 
 	kprint_newline();
 	kprint(str2, 0x06);
