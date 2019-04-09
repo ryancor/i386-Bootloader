@@ -1,3 +1,4 @@
+#include "devices/fpu.h"
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
 #include "../cpu/timer.h"
@@ -168,6 +169,7 @@ void cmain(void)
 
         // Hardware drivers
         tasking_install();
+	fpu_install(); // enable floating point units
 
 	delay();
 
