@@ -18,9 +18,10 @@ gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/fs/pipe.c -o x86_kern_src/k
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/mem/mem.c -o x86_kern_src/kernel/mem/mem.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/sys/process.c -o x86_kern_src/kernel/sys/process.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/sys/task.c -o x86_kern_src/kernel/sys/task.o
+gcc -fno-stack-protector -Wno-incompatible-pointer-types -m32 -c x86_kern_src/kernel/sys/syscall.c -o x86_kern_src/kernel/sys/syscall.o
 gcc -fno-stack-protector -m32 -c x86_kern_src/kernel/devices/fpu.c -o x86_kern_src/kernel/devices/fpu.o
 echo "Finished compiling object files"
-ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/boot/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/cpu/interrupt.o x86_kern_src/cpu/idt.o x86_kern_src/cpu/isr.o x86_kern_src/cpu/timer.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/kernel/fs/fs.o x86_kern_src/kernel/fs/pipe.o x86_kern_src/kernel/fs/list.o x86_kern_src/kernel/mem/mem.o x86_kern_src/drivers/screen.o x86_kern_src/drivers/mouse.o x86_kern_src/drivers/cmos.o x86_kern_src/kernel/interrupts/int.o x86_kern_src/kernel/sys/process.o x86_kern_src/kernel/sys/task.o x86_kern_src/kernel/devices/fpu.o
+ld -m elf_i386 -T link/link.ld -o image/kernel x86_kern_src/boot/kasm.o x86_kern_src/kernel/kc.o x86_kern_src/cpu/interrupt.o x86_kern_src/cpu/idt.o x86_kern_src/cpu/isr.o x86_kern_src/cpu/timer.o x86_kern_src/userspace/shell.o x86_kern_src/grub_framework/s_string.o x86_kern_src/kernel/ports/ports.o x86_kern_src/kernel/fs/fs.o x86_kern_src/kernel/fs/pipe.o x86_kern_src/kernel/fs/list.o x86_kern_src/kernel/mem/mem.o x86_kern_src/drivers/screen.o x86_kern_src/drivers/mouse.o x86_kern_src/drivers/cmos.o x86_kern_src/kernel/interrupts/int.o x86_kern_src/kernel/sys/process.o x86_kern_src/kernel/sys/task.o x86_kern_src/kernel/sys/syscall.o x86_kern_src/kernel/devices/fpu.o
 echo "Completed linkage on both files.."
 rm -rf x86_kern_src/*.o
 rm -rf x86_kern_src/cpu/*.o
