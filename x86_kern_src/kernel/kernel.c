@@ -170,6 +170,7 @@ void cmain(void)
         // Hardware drivers
         tasking_install();
 	fpu_install(); // enable floating point units
+	syscalls_install(); // Install the system calls
 
 	delay();
 
