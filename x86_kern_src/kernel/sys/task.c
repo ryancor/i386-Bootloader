@@ -32,3 +32,9 @@ void tasking_install(void)
 	IRQ_RES;
 	kprint("[+] Multi-tasking finished initializing!\n", 0x07);
 }
+
+void task_exit(int retval)
+{
+	retval = 0;
+	return;
+}
