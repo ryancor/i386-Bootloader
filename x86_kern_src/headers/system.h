@@ -138,4 +138,6 @@ process_t *spawn_init(void);
 process_t *spawn_kidle(void);
 void switch_page_directory(page_directory_t *dir);
 void tasking_install(void);
+void task_exit(int retval);
 
+void syscalls_install(void);
