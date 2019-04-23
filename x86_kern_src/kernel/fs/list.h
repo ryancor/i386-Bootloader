@@ -17,11 +17,6 @@ typedef struct
 
 #define foreach(item, list)	for(node_t *(item) = (node_t*)(list); (item); (item) = (item)->next)
 
-typedef struct process
-{
-	list_t *node_waits;
-} process_t;
-
 void list_append(list_t *list, node_t *item);
 node_t *list_insert(list_t *list, void *item);
 list_t *list_create(void);

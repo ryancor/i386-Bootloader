@@ -1,6 +1,10 @@
+#ifndef SYSTEM_H
+#define SYSTEM_H
+
 #include "time.h"
 #include "../grub_framework/headers/s_stdint.h"
 #include "../grub_framework/headers/s_string.h"
+#include "../kernel/fs/list.h"
 #include "../kernel/interrupts/headers/int.h"
 
 typedef signed int pid_t;
@@ -85,6 +89,19 @@ typedef struct signal_table
 	uintptr_t functions[NUMSIGNALS+1];
 } sig_table_t;
 
+typedef struct tree_node
+{
+	void *value;
+	list_t *children;
+	struct tree_node *parent;
+} tree_node_t;
+
+typedef struct
+{
+	size_t nodes;
+	tree_node_t *root;
+} tree_t;
+
 typedef struct process
 {
 	pid_t id;
@@ -101,7 +118,7 @@ typedef struct process
 	pid_t session;
 
 	thread_t thread;
-	//tree_node_t *tree_entry;
+	tree_node_t *tree_entry;
 	image_t image;
 	//fs_node_t *wd_node;
 	char *wd_name;
@@ -112,19 +129,19 @@ typedef struct process
 	uint8_t started;
 	uint8_t running;
 	//struct regs *syscall_registers;
-	//list_t *wait_queue;
-	//list_t *shm_mappings;
-	//list_t *signal_queue;
+	list_t *wait_queue;
+	list_t *shm_mappings;
+	list_t *signal_queue;
 	thread_t signal_state;
 	char *signal_kstack;
-	//node_t sched_node;
-	//node_t sleep_node;
-	//node_t *timed_sleep_node;
+	node_t sched_node;
+	node_t sleep_node;
+	node_t *timed_sleep_node;
 	uint8_t is_tasklet;
 	volatile uint8_t sleep_interrupted;
-	//list_t *node_waits;
+	list_t *node_waits;
 	int awoken_index;
-	//node_t *timeout_node;
+	node_t *timeout_node;
 	struct timeval start;
 	uint8_t suspended;
 } process_t;
@@ -141,3 +158,9 @@ void tasking_install(void);
 void task_exit(int retval);
 
 void syscalls_install(void);
+
+tree_t *tree_create(void);
+void tree_set_root(tree_t *tree, void *value);
+void shm_install(void);
+
+#endif

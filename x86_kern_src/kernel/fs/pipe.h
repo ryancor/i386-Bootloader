@@ -16,5 +16,11 @@ typedef struct _pipe_device
 	list_t *alert_waits;
 } pipe_device_t;
 
+typedef struct 
+{
+        list_t *node_waits;
+} process_t;
+
+
 fs_node_t *make_pipe(size_t size);
 int pipe_size(fs_node_t *node);

@@ -49,7 +49,7 @@ node_t *list_find(list_t *list, void *value)
 
 list_t *list_create(void)
 {
-	list_t *out = s_malloc(sizeof(list_t));
+	list_t *out = kmalloc(sizeof(list_t), 0, (uint32_t*)&out);
 	out->head = NULL;
 	out->tail = NULL;
 	out->length = 0;

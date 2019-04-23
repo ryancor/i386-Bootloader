@@ -172,6 +172,8 @@ void cmain(void)
 	fpu_install(); // enable floating point units
 	syscalls_install(); // Install the system calls
 
+	shm_install();	// Install shared memory
+
 	delay();
 
 	return;
