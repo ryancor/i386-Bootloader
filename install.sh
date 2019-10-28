@@ -1,3 +1,5 @@
+nasm -f bin x86_kern_src/boot/bootsect.asm -i'x86_kern_src/boot/' -o image/bootsect.bin
+echo "Compile second stage bootloader"
 nasm -f elf32 x86_kern_src/boot/kernel_entry.asm -o x86_kern_src/boot/kasm.o
 nasm -f elf32 x86_kern_src/cpu/interrupt.asm -o x86_kern_src/cpu/interrupt.o
 echo "Finished compiling asm file"
@@ -53,6 +55,10 @@ echo "Finished creating image.."
 mv kernel.img image/
 genisoimage -quiet -V 'MYOS' -input-charset iso8859-1 -o image/kernel.iso -b kernel.img -hide kernel.img image/
 echo "Finished creating ISO....."
+
+echo "Creating os-image from 1st stage boot"
+cat image/bootsect.bin image/kernel > image/os-image.bin
+# run with qemu-system-i386 -s -fda image/os-image.bin
 
 echo "Starting emulation..."
 qemu-system-i386 -kernel image/kernel
